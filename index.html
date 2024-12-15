@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCM Interactif</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background-color: #6200ea;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .question {
+            margin-bottom: 1.5rem;
+        }
+        .question h3 {
+            font-size: 1.2rem;
+        }
+        .answers label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #6200ea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .btn:hover {
+            background-color: #3700b3;
+        }
+        .result {
+            margin-top: 2rem;
+            background-color: #e0f7fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>QCM Interactif</h1>
+        <p>Répondez aux questions et validez pour voir vos résultats.</p>
+    </header>
+    <div class="container">
+        <form id="qcm-form">
+            <!-- Dynamically add questions from the script -->
+        </form>
+        <button type="button" class="btn" onclick="calculateResults()">Valider mes réponses</button>
+        <div id="results" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        const questions = [
+            { id: 1, question: "Quel est l'objectif principal d'Internet ?", answers: [
+                "Offrir une solution de stockage sécurisée",
+                "Interconnecter des équipements différents",
+                "Fournir un réseau fermé et privé",
+                "Gérer les données d'entreprise"], correct: 1, explanation: "Internet a pour objectif principal d'interconnecter des équipements ayant des architectures différentes." },
+            { id: 2, question: "Le modèle TCP/IP se compose de combien de couches ?", answers: ["5", "4", "7", "3"], correct: 1, explanation: "Le modèle TCP/IP se compose de 4 couches : Liaison, Internet, Transport, Application." },
+            { id: 3, question: "Quels sont les éléments d'un PDU (Protocol Data Unit) ?", answers: [
+                "SDU et PCI",
+                "Header et Footer",
+                "Payload et Trailer",
+                "MTU et MSS"], correct: 0, explanation: "Un PDU est constitué de l'unité de données de service (SDU) et des informations de contrôle de protocole (PCI)." },
+            { id: 4, question: "Dans le modèle OSI, quelle couche est équivalente à la couche Transport de TCP/IP ?", answers: ["Session", "Transport", "Application", "Liaison de données"], correct: 1, explanation: "Dans le modèle OSI, la couche Transport est équivalente à la couche Transport du modèle TCP/IP." },
+            { id: 5, question: "Le processus d'encapsulation des données inclut l'ajout d'un en-tête à chaque couche. Que contient cet en-tête ?", answers: [
+                "La charge utile",
+                "Les informations de contrôle de la couche",
+                "Les données brutes",
+                "Le formatage des trames"], correct: 1, explanation: "L'encapsulation ajoute des informations de contrôle spécifiques à chaque couche dans l'en-tête." },
+            { id: 6, question: "Quel est le rôle de l’IETF dans la normalisation d’Internet ?", answers: [
+                "Supervision des connexions TCP",
+                "Production des protocoles sous forme de RFC",
+                "Gestion des noms de domaine",
+                "Création des interfaces utilisateur"], correct: 1, explanation: "L’IETF est responsable de la production des RFC, qui définissent les protocoles Internet." },
+            { id: 7, question: "Le protocole IP fonctionne en mode :", answers: ["Connecté", "Non connecté", "Hybride", "Sécurisé"], correct: 1, explanation: "Le protocole IP est un protocole non connecté qui ne garantit pas la livraison des paquets." },
+            { id: 8, question: "Quel protocole est responsable de la fragmentation des paquets et du routage ?", answers: ["TCP", "UDP", "IP", "HTTP"], correct: 2, explanation: "Le protocole IP gère la fragmentation et le routage des paquets." },
+            { id: 9, question: "Quelle est la différence majeure entre TCP et UDP ?", answers: [
+                "TCP gère les séquences et les erreurs, UDP non",
+                "UDP est sécurisé, TCP ne l'est pas",
+                "TCP est plus rapide que UDP",
+                "UDP supporte les connexions persistantes"], correct: 0, explanation: "TCP est orienté connexion et assure la fiabilité, tandis qu'UDP est rapide mais non fiable." },
+            { id: 10, question: "Pour quelle utilisation le protocole UDP est-il le mieux adapté ?", answers: [
+                "Transfert de fichiers",
+                "Streaming en temps réel",
+                "Applications bancaires",
+                "Systèmes de messagerie électronique"], correct: 1, explanation: "UDP est souvent utilisé pour le streaming, car il est rapide et tolérant aux pertes de paquets." },
+            { id: 11, question: "Que signifie le 'three-way handshake' en TCP ?", answers: [
+                "Une méthode de fermeture de connexion",
+                "Un processus d'authentification",
+                "Un échange en trois segments pour établir une connexion",
+                "Une technique de contrôle de flux"], correct: 2, explanation: "Le 'three-way handshake' est une séquence de 3 messages échangés pour établir une connexion TCP." },
+            { id: 12, question: "Quels sont les drapeaux (flags) utilisés lors de l’établissement d’une connexion TCP ?", answers: ["SYN et FIN", "SYN et ACK", "URG et PSH", "RST et ACK"], correct: 1, explanation: "Les flags SYN et ACK sont utilisés pour négocier l'ouverture de la connexion." },
+            { id: 13, question: "Dans quelles conditions une connexion TCP utilise-t-elle le flag RST ?", answers: [
+                "Pour ouvrir une connexion",
+                "Pour réinitialiser ou refuser une connexion",
+                "Pour accélérer le transfert",
+                "Pour signaler une perte de paquets"], correct: 1, explanation: "Le flag RST est utilisé pour interrompre ou réinitialiser une connexion." },
+            { id: 14, question: "Quel port est utilisé par défaut pour SMTP sécurisé ?", answers: [
+                "25", "587", "110", "143"], correct: 1, explanation: "Le port 587 est généralement utilisé pour les connexions SMTP sécurisées avec STARTTLS." },
+            { id: 15, question: "Le protocole IMAP permet de :", answers: [
+                "Manipuler les emails directement sur le serveur",
+                "Télécharger et supprimer les emails du serveur",
+                "Envoyer des emails via un serveur intermédiaire",
+                "Assurer la livraison des emails uniquement"], correct: 0, explanation: "IMAP offre la possibilité de lire, trier et gérer les emails directement sur le serveur." },
+            { id: 16, question: "Dans un email, quelle partie contient les informations de routage ?", answers: [
+                "Le corps", "L'en-tête", "Les pièces jointes", "La signature"], correct: 1, explanation: "L'en-tête contient les informations nécessaires pour acheminer un email, telles que l'expéditeur et le destinataire." },
+            { id: 17, question: "Quel protocole utilise le port TCP 110 pour la récupération des emails ?", answers: ["SMTP", "IMAP", "POP3", "HTTP"], correct: 2, explanation: "Le protocole POP3 utilise le port 110 pour permettre aux clients de récupérer les emails depuis un serveur." },
+            { id: 18, question: "Quelle commande POP3 est utilisée pour télécharger un message ?", answers: ["LIST", "RETR", "TOP", "STAT"], correct: 1, explanation: "La commande RETR permet de télécharger un message complet depuis le serveur." },
+            { id: 19, question: "Quelles sont les fonctionnalités d'un MUA (Mail User Agent) ?", answers: ["Stocker les emails sur le serveur", "Envoyer, recevoir et organiser les emails", "Transférer les emails entre serveurs", "Sécuriser les connexions"], correct: 1, explanation: "Un MUA permet aux utilisateurs de composer, envoyer, recevoir et organiser leurs emails." },
+            { id: 20, question: "Quel protocole permet la gestion en ligne des emails avec partage de boîtes ?", answers: ["SMTP", "IMAP", "POP3", "SNMP"], correct: 1, explanation: "Le protocole IMAP permet de gérer les emails directement sur le serveur avec des fonctionnalités avancées comme le partage de boîtes." },
+            { id: 21, question: "Le protocole STARTTLS permet de :", answers: ["Activer le chiffrement TLS", "Accélérer le transfert des emails", "Authentifier les utilisateurs", "Analyser les pièces jointes"], correct: 0, explanation: "STARTTLS est une extension des protocoles SMTP, POP3 et IMAP qui active le chiffrement TLS pour sécuriser les connexions." },
+            { id: 22, question: "Comment le protocole SMTP assure-t-il l’envoi des emails ?", answers: ["Avec des sessions TCP encapsulées", "En utilisant des messages UDP", "Avec des commandes HTTP", "En gérant les boîtes aux lettres locales"], correct: 0, explanation: "SMTP utilise des sessions TCP pour transmettre les emails entre les serveurs de manière fiable." },
+            { id: 23, question: "Quel protocole permet le transfert en ligne des emails sans suppression locale ?", answers: ["SMTP", "IMAP", "POP3", "FTP"], correct: 1, explanation: "IMAP permet de gérer les emails directement sur le serveur sans les supprimer après lecture." },
+            { id: 24, question: "La commande EHLO dans SMTP est utilisée pour :", answers: ["Vérifier l'état du serveur", "Négocier les extensions supportées", "Terminer une session SMTP", "Authentifier un utilisateur"], correct: 1, explanation: "La commande EHLO permet au client SMTP de découvrir les extensions supportées par le serveur." },
+            { id: 25, question: "Quel est le rôle du MSA dans l’architecture de messagerie ?", answers: ["Acheminer les emails entre serveurs", "Soumettre les emails à un MTA", "Stocker les emails dans les boîtes", "Envoyer les réponses automatiques"], correct: 1, explanation: "Le Mail Submission Agent (MSA) reçoit les emails du MUA et les soumet au MTA pour transfert." },
+            { id: 26, question: "Le protocole POP3 fonctionne en mode :", answers: ["Connecté", "Non connecté", "Hors ligne", "Hybride"], correct: 2, explanation: "POP3 permet de récupérer les emails depuis un serveur et de les stocker localement pour une consultation hors ligne." },
+            { id: 27, question: "Quel champ d’un email est toujours codé en US-ASCII ?", answers: ["Le corps", "L'en-tête", "Les pièces jointes", "Le contenu MIME"], correct: 1, explanation: "Les champs d'en-tête des emails, comme 'From' ou 'To', sont toujours codés en US-ASCII." },
+            { id: 28, question: "Quel rôle joue le protocole DSN dans SMTP ?", answers: ["Envoyer les notifications d’état de livraison", "Gérer les boîtes aux lettres partagées", "Optimiser les transferts de paquets", "Activer le chiffrement TLS"], correct: 0, explanation: "DSN (Delivery Status Notification) informe l'expéditeur de l'état de livraison d'un email." },
+            { id: 29, question: "Quels protocoles sont couramment utilisés pour récupérer des emails ?", answers: ["SMTP et FTP", "POP3 et IMAP", "IMAP et HTTP", "SNMP et SMTP"], correct: 1, explanation: "POP3 et IMAP sont les deux protocoles standards utilisés pour la récupération des emails." },
+            { id: 30, question: "Quelle solution combine les fonctionnalités de MUA, MTA et MDA ?", answers: ["Microsoft Exchange", "IMAP", "SMTP", "POP3"], correct: 0, explanation: "Des solutions comme Microsoft Exchange intègrent les rôles de MUA, MTA et MDA pour une gestion complète des emails." }
+        ];
+
+        function renderQuestions() {
+            const form = document.getElementById('qcm-form');
+            questions.forEach(({ id, question, answers }) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `<h3>${id}. ${question}</h3>`;
+                const answersDiv = document.createElement('div');
+                answersDiv.className = 'answers';
+                answers.forEach((answer, index) => {
+                    answersDiv.innerHTML += `<label><input type="radio" name="q${id}" value="${index}"> ${answer}</label>`;
+                });
+                questionDiv.appendChild(answersDiv);
+                form.appendChild(questionDiv);
+            });
+        }
+
+        function calculateResults() {
+            const resultsDiv = document.getElementById('results');
+            const form = document.getElementById('qcm-form');
+            let score = 0;
+            let feedback = "";
+            questions.forEach(({ id, correct, explanation }) => {
+                const selected = form[`q${id}`].value;
+                if (parseInt(selected) === correct) {
+                    score++;
+                    feedback += `<p><strong>Question ${id}:</strong> Correct! <br>${explanation}</p>`;
+                } else {
+                    feedback += `<p><strong>Question ${id}:</strong> Incorrect. <br>${explanation}</p>`;
+                }
+            });
+
+            resultsDiv.innerHTML = `<h2>Votre score : ${score}/${questions.length}</h2>` + feedback;
+            resultsDiv.style.display = 'block';
+        }
+
+        renderQuestions();
+    </script>
+</body>
+</html>
